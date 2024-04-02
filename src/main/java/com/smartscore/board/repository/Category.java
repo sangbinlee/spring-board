@@ -1,10 +1,15 @@
 package com.smartscore.board.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,17 +23,29 @@ public class Category {
 	@Id
 	@GeneratedValue
 //	(strategy=GenerationType.AUTO)
+	@Column(name = "id")
 	private Long id;
 	private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Category parent;
-
-//	@ManyToMany(fetch = FetchType.LAZY)
+//	https://vladmihalcea.com/recursive-associations-jpa-hibernate/
+//    @ManyToOne(fetch = FetchType.LAZY)
+////    @JoinColumn(name = "c_id")
 //    private Category parent;
 
-//	@OneToMany(fetch = FetchType.LAZY)
-//    private Category parent;
+//    @OneToMany(fetch = FetchType.LAZY)
+//    private Category children;
+
+//	  @ManyToMany
+//	  @OneToMany
+//	  @JoinTable(name = "menu")
+//	            joinColumns = @JoinColumn(name = "parent_id"))
+//	  @JoinColumn(name = "c_id")
+//	  List<Menu> menu = new ArrayList<Menu>();
+
+	  @OneToMany
+	  @JoinColumn(name = "category_id", updatable = false)
+	  private List<Menu> menus = new ArrayList<>();
+
 
 
 }
