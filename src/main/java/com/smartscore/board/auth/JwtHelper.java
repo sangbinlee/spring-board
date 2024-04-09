@@ -3,6 +3,9 @@ package com.smartscore.board.auth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +13,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtHelper {
@@ -35,7 +40,12 @@ public class JwtHelper {
 
     // For retrieving any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {                                    // i d k
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    	// https://github.com/jwtk/jjwt#jws-create-key
+    	// https://stackoverflow.com/questions/73486900/how-to-fix-parser-is-deprecated-and-setsigningkeyjava-security-key-is-deprec
+//        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+//        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        SecretKey secret_ = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        Jwts.parserBuilder().setSigningKey(secret_).build().parseClaimsJws(jwt);
     }
 
     // Check if the token has expired
