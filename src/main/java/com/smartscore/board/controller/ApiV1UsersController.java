@@ -19,8 +19,11 @@ import com.smartscore.board.repository.UserRepository;
 import com.smartscore.board.repository.UserRepository2;
 import com.smartscore.board.repository.Users;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController // This means that this class is a Controller
 @RequestMapping(path = "/api/v1/users") // This means URL's start with /demo (after Application path)
+@Tag(name = "Users 컨트롤러", description = "Users API입니다.")
 public class ApiV1UsersController {
 
 	@Autowired
@@ -42,6 +45,27 @@ public class ApiV1UsersController {
 	@PostMapping()
 	public Users create(@RequestBody Users users) {
 		return userRepository2.save(users);
+	}
+
+	/**
+	 * 다중 데이터
+	 * 	[
+	 * 		{
+	 *   		"name": "333 Add your name in the body"
+	 * 		},
+	 * 		{
+	 *    		"name": "444 Add your name in the body"
+	 * 		}
+	 * 	]
+	 * @param users
+	 * @return
+	 */
+	@PostMapping("multi-add")
+	public List<Users> creates(@RequestBody List<Users> users) {
+		for (Users user : users) {
+			userRepository2.save(user);
+		}
+		return users;
 	}
 
 	/**

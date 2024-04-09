@@ -23,8 +23,7 @@ import lombok.NoArgsConstructor;
 public class Menu implements Serializable{
 
 	@Id
-//	@GeneratedValue
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 //	(strategy=GenerationType.AUTO)
 //    @Column(name = "id")
 	private Long id;
@@ -32,9 +31,9 @@ public class Menu implements Serializable{
 
 	private String category_id;
 
-    @ManyToOne
+//    @ManyToOne
 //    @OneToMany
-    @JoinColumn(name = "category_id", insertable = false, updatable = false)
-    private Category category;
+//    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+//    private Category category;
 
 }

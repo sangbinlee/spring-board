@@ -26,7 +26,11 @@ repositories {
 dependencies {
 
 
-
+	//Set JWT with Spring Boot and Swagger UI
+	// SwaggerConfig
+	// http://localhost:8080/swagger-ui/index.html
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.5.0'
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webflux-api', version: '2.5.0'
 
 
 

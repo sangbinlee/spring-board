@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class Category {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 //	@GeneratedValue
 //	(strategy=GenerationType.AUTO)
 //	@Column(name = "category_id")
@@ -44,11 +44,9 @@ public class Category {
 //	  @JoinColumn(name = "c_id")
 //	  List<Menu> menu = new ArrayList<Menu>();
 
-	  @OneToMany(mappedBy = "category")
+//	  @OneToMany(mappedBy = "category")
 //	  @JoinColumn(name = "category_id")
 //	  @JoinColumn(name = "id")
-	  private List<Menu> menus = new ArrayList<>();
-
-
+//	  private List<Menu> menus = new ArrayList<>();
 
 }
