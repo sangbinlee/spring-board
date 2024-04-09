@@ -26,6 +26,14 @@ repositories {
 dependencies {
 
 
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.12.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+
 	//Set JWT with Spring Boot and Swagger UI
 	// SwaggerConfig
 	// http://localhost:8080/swagger-ui/index.html
@@ -73,6 +81,7 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
 	testImplementation 'org.springframework.graphql:spring-graphql-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
