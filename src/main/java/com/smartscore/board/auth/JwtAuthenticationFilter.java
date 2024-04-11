@@ -1,14 +1,8 @@
 package com.smartscore.board.auth;
 
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,18 +12,32 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import com.smartscore.board.service.MemberService;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private Logger logger = LoggerFactory.getLogger(OncePerRequestFilter.class);
-    @Autowired
-    private JwtHelper jwtHelper;
+//    @Autowired
+    private final MemberService memberService;
+    private final JwtService jwtUtil;
 
-
-    @Autowired
-    private UserDetailsService userDetailsService;
+//	public static void main(String[] args) {
+//		String test = "Bearer 12345678901234567890";
+//		log.info("test.substring(7)={}", test.substring(7));
+//	}
+//    @Autowired
+//    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -43,34 +51,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String requestHeader = request.getHeader("Authorization");
         //Bearer 2352345235sdfrsfgsdfsdf
-        logger.info(" Header :  {}", request);
+        log.info(" Header :  {}", request);
         String username = null;
         String token = null;
-        if (requestHeader != null && requestHeader.startsWith("Bearer")) {
+        if (requestHeader != null && requestHeader.startsWith("Bearer ")) {
 
             //looking good
             token = requestHeader.substring(7);
-            try {
 
-                username = this.jwtHelper.getUsernameFromToken(token);
 
-            } catch (IllegalArgumentException e) {
-                logger.info("Illegal Argument while fetching the username !!");
-                e.printStackTrace();
-            } catch (ExpiredJwtException e) {
-                logger.info("Given jwt token is expired !!");
-                e.printStackTrace();
-            } catch (MalformedJwtException e) {
-                logger.info("Some changed has done in token !! Invalid Token");
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (jwtUtil.validateToken(token)) {
+            	Long memberId = jwtUtil.getMemberId();
 
+            	Member mddd = memberService.loadUserByUsername(memberId);
             }
+
+//            try {
+//
+//                username = jwtUtil.extractUsername(token);
+//
+//            } catch (IllegalArgumentException e) {
+//                log.info("Illegal Argument while fetching the username !!");
+//                e.printStackTrace();
+//            } catch (ExpiredJwtException e) {
+//                log.info("Given jwt token is expired !!");
+//                e.printStackTrace();
+//            } catch (MalformedJwtException e) {
+//                log.info("Some changed has done in token !! Invalid Token");
+//                e.printStackTrace();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//
+//            }
 
 
         } else {
-            logger.info("Invalid Header Value !! ");
+            log.info("Invalid Header Value !! ");
         }
 
 
@@ -79,8 +95,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
             //fetch user detail from username
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            Boolean validateToken = this.jwtHelper.validateToken(token, userDetails);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            Boolean validateToken = jwtUtil.validateToken(token, userDetails);
             if (validateToken) {
 
                 //set the authentication
@@ -90,7 +106,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
             } else {
-                logger.info("Validation fails !!");
+                log.info("Validation fails !!");
             }
 
 
