@@ -1,5 +1,6 @@
 package com.smartscore.board.config;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -13,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.smartscore.board.auth.JwtAuthenticationFilter;
 import com.smartscore.board.auth.JwtService;
-import com.smartscore.board.service.MemberService;
+import com.smartscore.board.service.CustomUserDetailsService;
 
 import lombok.AllArgsConstructor;
 
@@ -23,8 +24,10 @@ import lombok.AllArgsConstructor;
 @Configuration
 public class SecurityConfig {
 
+	private final CustomUserDetailsService customUserDetailsService;
 	private final JwtService jwtUtil;
-	private final MemberService memberService;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
 	// @Autowired
 	// private JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -48,29 +51,35 @@ public class SecurityConfig {
 		};
 
 		http.csrf(csrf -> csrf.disable())
-				.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(AUTH_WHITELIST).permitAll()
 						.anyRequest().authenticated());
 		http.headers(headers -> headers.frameOptions(frameOption -> frameOption.sameOrigin()));
 		http.authenticationProvider(authenticationProvider());
-		http.addFilterBefore(new JwtAuthenticationFilter(memberService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(new JwtAuthenticationFilter(customUserDetailsService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
+		
+		http.exceptionHandling((exceptionHandling) -> exceptionHandling
+			.authenticationEntryPoint(authenticationEntryPoint)
+			.accessDeniedHandler(accessDeniedHandler)
+		);
+		
 		return http.build();
 	}
 
 	@Bean
 	public DaoAuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-		daoAuthenticationProvider.setUserDetailsService(memberService);
+		daoAuthenticationProvider.setUserDetailsService(customUserDetailsService);
 		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 		return daoAuthenticationProvider;
 	}
 
-	// PasswordEncoder Bean
+
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
+	
 }

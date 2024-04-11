@@ -11,5 +11,6 @@ public interface MemberCrudRepository extends CrudRepository<Member, Long> {
 	// JpaRepository
 	// Page<Member> findAll(Pageable pageable);
 	// Page<Member> findByNameContains(String name, Pageable pageable);
+//	Optional<Member> findById(Long id);
 	Optional<Member> findById(Long id);
 }

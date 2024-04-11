@@ -3,19 +3,14 @@ package com.smartscore.board.auth;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.smartscore.board.service.MemberService;
+import com.smartscore.board.service.CustomUserDetailsService;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 //    @Autowired
-    private final MemberService memberService;
+    private final CustomUserDetailsService customUserDetailsService;
     private final JwtService jwtUtil;
 
 //	public static void main(String[] args) {
@@ -41,13 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-//        try {
-//            Thread.sleep(500);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-        //Authorization
 
         String requestHeader = request.getHeader("Authorization");
         //Bearer 2352345235sdfrsfgsdfsdf
@@ -63,57 +51,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtUtil.validateToken(token)) {
             	Long memberId = jwtUtil.getMemberId();
 
-            	Member mddd = memberService.loadUserByUsername(memberId);
+            	UserDetails userDetails = customUserDetailsService.loadUserByUsername(memberId.toString());
+            	
+                if (userDetails != null) {
+                    //UserDetsils, Password, Role -> 접근권한 인증 Token 생성
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                    //현재 Request의 Security Context에 접근권한 설정
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
             }
-
-//            try {
-//
-//                username = jwtUtil.extractUsername(token);
-//
-//            } catch (IllegalArgumentException e) {
-//                log.info("Illegal Argument while fetching the username !!");
-//                e.printStackTrace();
-//            } catch (ExpiredJwtException e) {
-//                log.info("Given jwt token is expired !!");
-//                e.printStackTrace();
-//            } catch (MalformedJwtException e) {
-//                log.info("Some changed has done in token !! Invalid Token");
-//                e.printStackTrace();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//
-//            }
-
-
-        } else {
-            log.info("Invalid Header Value !! ");
-        }
-
-
-        //
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-
-            //fetch user detail from username
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            Boolean validateToken = jwtUtil.validateToken(token, userDetails);
-            if (validateToken) {
-
-                //set the authentication
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-
-            } else {
-                log.info("Validation fails !!");
-            }
-
-
-        }
-
+        }  
         filterChain.doFilter(request, response); //doubt hai
-
-
     }
 }
