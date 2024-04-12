@@ -46,7 +46,9 @@
 	/spring-board/src/main/resources/application.properties
 		springdoc.show-login-endpoint=true
 
-#
+# refresh-token  ------- 진행중.
+
+	https://github.com/sangbinlee/spring-boot-refresh-token-jwt
 #
 #
 #
