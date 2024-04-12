@@ -1,15 +1,14 @@
 package com.smartscore.board.auth;
 
-
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.smartscore.board.service.CustomUserDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,46 +22,38 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-//    @Autowired
-    private final CustomUserDetailsService customUserDetailsService;
-    private final JwtService jwtUtil;
+	private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
-//	public static void main(String[] args) {
-//		String test = "Bearer 12345678901234567890";
-//		log.info("test.substring(7)={}", test.substring(7));
-//	}
-//    @Autowired
-//    private final UserDetailsService userDetailsService;
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        String requestHeader = request.getHeader("Authorization");
-        //Bearer 2352345235sdfrsfgsdfsdf
-        log.info(" Header :  {}", request);
-        String username = null;
-        String token = null;
-        if (requestHeader != null && requestHeader.startsWith("Bearer ")) {
-
-            //looking good
-            token = requestHeader.substring(7);
+		log.info("[JwtAuthenticationFilter]");
+		Optional<String> authHeader = Optional.ofNullable(request.getHeader("Authorization"));
+		log.info("[JwtAuthenticationFilter] authHeader={}", authHeader);
+		if (authHeader.isEmpty() || !authHeader.get().startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+		log.info("[JwtAuthenticationFilter2]");
+		final String jwt = authHeader.get().substring(7);
+		final String userId = jwtService.extractUsername(jwt);
+		if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+			log.info("[JwtAuthenticationFilter3] jwt={}", jwt);
+			log.info("[JwtAuthenticationFilter3] userId={}", userId);
+			var userDetails = this.userDetailsService.loadUserByUsername(userId);
+			log.info("[JwtAuthenticationFilter3] userDetails={}", userDetails);
 
 
-            if (jwtUtil.validateToken(token)) {
-            	Long memberId = jwtUtil.getMemberId();
+			if (jwtService.isTokenValid(jwt, userDetails)) {
+				final var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				SecurityContextHolder.getContext().setAuthentication(authToken);
 
-            	UserDetails userDetails = customUserDetailsService.loadUserByUsername(memberId.toString());
-            	
-                if (userDetails != null) {
-                    //UserDetsils, Password, Role -> 접근권한 인증 Token 생성
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                    //현재 Request의 Security Context에 접근권한 설정
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                }
-            }
-        }  
-        filterChain.doFilter(request, response); //doubt hai
-    }
+				log.info("[JwtAuthenticationFilter4] authToken={}", authToken);
+			}
+		}
+		log.info("[JwtAuthenticationFilter5]");
+		filterChain.doFilter(request, response);
+	}
 }

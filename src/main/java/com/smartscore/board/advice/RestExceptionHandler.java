@@ -5,32 +5,83 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.smartscore.board.exception.BadCredentialsException;
+import com.smartscore.board.exception.UsernameNotFoundException;
+
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice
+//@Order(Ordered.HIGHEST_PRECEDENCE)
+@RestControllerAdvice
 @Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+
+
+
+
+    @ExceptionHandler({ApiException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request, final ApiException e) {
+        //e.printStackTrace();
+        return ResponseEntity
+                .status(e.getError().getStatus())
+                .body(ApiExceptionEntity.builder()
+                        .errorCode(e.getError().getCode())
+                        .errorMessage(e.getError().getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request, final RuntimeException e) {
+        e.printStackTrace();
+        return ResponseEntity
+                .status(ExceptionEnum.RUNTIME_EXCEPTION.getStatus())
+                .body(ApiExceptionEntity.builder()
+                        .errorCode(ExceptionEnum.RUNTIME_EXCEPTION.getCode())
+                        .errorMessage(e.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request, final AccessDeniedException e) {
+        e.printStackTrace();
+        return ResponseEntity
+                .status(ExceptionEnum.ACCESS_DENIED_EXCEPTION.getStatus())
+                .body(ApiExceptionEntity.builder()
+                        .errorCode(ExceptionEnum.ACCESS_DENIED_EXCEPTION.getCode())
+                        .errorMessage(e.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request, final Exception e) {
+        e.printStackTrace();
+        return ResponseEntity
+                .status(ExceptionEnum.INTERNAL_SERVER_ERROR.getStatus())
+                .body(ApiExceptionEntity.builder()
+                        .errorCode(ExceptionEnum.INTERNAL_SERVER_ERROR.getCode())
+                        .errorMessage(e.getMessage())
+                        .build());
+    }
+
+
+
+
+
+
+
+
 
     /**
      * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
@@ -210,6 +261,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setDebugMessage(ex.getMessage());
         return buildResponseEntity(apiError);
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    protected ResponseEntity<Object> handleEntityBadCredentials(
+            EntityNotFoundException ex) {
+        ApiError apiError = new ApiError(NOT_FOUND);
+        apiError.setMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    protected ResponseEntity<Object> handleEntityUsernameNotFound(
+            EntityNotFoundException ex) {
+        ApiError apiError = new ApiError(NOT_FOUND);
+        apiError.setMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
+    }
+
 
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {

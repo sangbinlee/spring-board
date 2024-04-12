@@ -38,96 +38,56 @@ public class JwtService {
 	@Value("${jwt.expiration_time}")
 	private long expirationTime;
 
+	// private static SecretKey secretKey = Jwts.SIG.HS256.key().build();
 
-
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
 
 	private SecretKey getSecretKey() {
-		 log.info("secretString={}",secretString);
+		log.info("secretString={}", secretString);
 		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
 	}
 
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token);
-            return true;
-        } catch (SecurityException e) {
-            log.info("Invalid JWT Token 1", e);
-        } catch ( MalformedJwtException e) {
-            log.info("Invalid JWT Token 2", e);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty.", e);
-        }
-        return false;
-    }
-
-//	private static String secretString;
-
-//    public void setSecretString(String jwtSecretString) {
-//		JwtService.secretString = jwtSecretString;
-//		log.info("jwtSecretString={}", jwtSecretString);
-//		log.info("JwtService.secretString={}", JwtService.secretString);
-//    }
-	// public static final String secretString =
-	// "357638792F423F4428472B4B6250655368566D597133743677397A2443264629";
-	// public static final String secretString =
-	// "12345678901234567890123456789012345678901234567890123456789012345678901234567890";
-//	private static SecretKey secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
-	// private static SecretKey secretKey =
-	// Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
-
-    // JWT Token 을 이용해 memberId 추출
-    public Long getMemberId() {
-        String accessToken = getJWT();
-		log.info("token={}", accessToken);
-
-				// 적당히 여기서 예외처리해도 된다.
-        if (accessToken == null) {
-            return null;
-        }
-        if (accessToken.isEmpty()) {
-            return null;
-        }
-
-        Jws<Claims> jws = Jwts.parser()
-                    .verifyWith(getSecretKey())
-                    .build()
-                    .parseSignedClaims(accessToken);
-        return jws.getPayload()
-                .get("memberId", Long.class);
-    }
-
-	public static void main(String[] args) {
-//		log.info("secretKey={}", getSecretKey());
-//		 log.info("secretString={}",secretString);
-//		 log.info("secretKey={}",secretKey);
-		// log.info("secretKey={}",secretKey);
-		// log.info("secretKey={}",secretKey);
-		// log.info("secretKey={}",secretKey);
-		// SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
-		// log.info("key={}",key);
-		// SecretKey key2 = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
-		// log.info("key2={}",key2);
-		// SecretKey key3 = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
-		// log.info("key3={}",key3);
-		// SecretKey key4 = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
-		// log.info("key4={}",key4);
-		//
-		// SecretKey secretKey1 = Jwts.SIG.HS256.key().build();
-		// SecretKey secretKey2 = Jwts.SIG.HS256.key().build();
-		// SecretKey secretKey3 = Jwts.SIG.HS256.key().build();
-		// SecretKey secretKey4 = Jwts.SIG.HS256.key().build();
-		// log.info("secretKey1={}",secretKey1);
-		// log.info("secretKey2={}",secretKey2);
-		// log.info("secretKey3={}",secretKey3);
-		// log.info("secretKey4={}",secretKey4);
+	public boolean validateToken(String token) {
+		try {
+			Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token);
+			return true;
+		} catch (SecurityException e) {
+			log.info("Invalid JWT Token 1", e);
+		} catch (MalformedJwtException e) {
+			log.info("Invalid JWT Token 2", e);
+		} catch (ExpiredJwtException e) {
+			log.info("Expired JWT Token", e);
+		} catch (UnsupportedJwtException e) {
+			log.info("Unsupported JWT Token", e);
+		} catch (IllegalArgumentException e) {
+			log.info("JWT claims string is empty.", e);
+		}
+		return false;
 	}
 
-	// private static SecretKey secretKey = Jwts.SIG.HS256.key().build();
+	// JWT Token 을 이용해 memberId 추출
+	public Long getMemberId() {
+		String accessToken = getJWT();
+		log.info("token={}", accessToken);
+
+		// 적당히 여기서 예외처리해도 된다.
+		if (accessToken == null) {
+			return null;
+		}
+		if (accessToken.isEmpty()) {
+			return null;
+		}
+
+		Jws<Claims> jws = Jwts.parser()
+				.verifyWith(getSecretKey())
+				.build()
+				.parseSignedClaims(accessToken);
+		return jws.getPayload()
+				.get("memberId", Long.class);
+	}
 
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
@@ -172,18 +132,28 @@ public class JwtService {
 		return createTokenById(claims, id);
 	}
 
+    public String generateToken(Map<String, Object> extraClaims, String username) {
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5))
+                .signWith(getSecretKey())
+                .compact();
+    }
 	public String createAccessToken(Member member) {
-		Claims claims = (Claims) Jwts.claims();
-		claims.put("memberId", member.getId());
-        claims.put("email", member.getEmail());
-//        claims.put("role", member.getRole());
+		// Claims claims = (Claims) Jwts.claims();
+		Map<String, Object> claimMap = new HashMap<>();
+		claimMap.put("memberId", member.getId());
+		claimMap.put("email", member.getEmail());
+		// claims.put("role", member.getRole());
 
-        ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime tokenValidity = now.plusSeconds(expirationTime);
+		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime tokenValidity = now.plusSeconds(expirationTime);
 
 		return Jwts.builder()
-				.claims(claims)
-//				.subject(username)
+				.claims(claimMap)
+				// .subject(username)
 				.issuedAt(Date.from(now.toInstant()))
 				.expiration(Date.from(tokenValidity.toInstant())) // 1분?
 				.signWith(getSecretKey())
@@ -191,17 +161,18 @@ public class JwtService {
 	}
 
 	public String createAccessToken(MemberDto member) {
-		Claims claims = (Claims) Jwts.claims();
-		claims.put("memberId", member.getId());
-        claims.put("email", member.getEmail());
-//        claims.put("role", member.getRole());
+		// Claims claims = (Claims) Jwts.claims();
+		Map<String, Object> claimMap = new HashMap<>();
+		claimMap.put("memberId", member.getId());
+		claimMap.put("email", member.getEmail());
+		// claims.put("role", member.getRole());
 
-        ZonedDateTime now = ZonedDateTime.now();
-        ZonedDateTime tokenValidity = now.plusSeconds(expirationTime);
+		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime tokenValidity = now.plusSeconds(expirationTime);
 
 		return Jwts.builder()
-				.claims(claims)
-//				.subject(username)
+				.claims(claimMap)
+				// .subject(username)
 				.issuedAt(Date.from(now.toInstant()))
 				.expiration(Date.from(tokenValidity.toInstant())) // 1분?
 				.signWith(getSecretKey())
@@ -236,7 +207,7 @@ public class JwtService {
 				.subject(username)
 				.issuedAt(new Date(System.currentTimeMillis()))
 				.expiration(new Date(System.currentTimeMillis() + expirationTime)) // 1분?
-//				.expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 1)) // 1분?
+				// .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 1)) // 1분?
 				// .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24L)) //
 				// 24시간
 				.signWith(getSecretKey())

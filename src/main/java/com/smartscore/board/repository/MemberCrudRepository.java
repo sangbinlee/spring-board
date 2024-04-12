@@ -12,5 +12,6 @@ public interface MemberCrudRepository extends CrudRepository<Member, Long> {
 	// Page<Member> findAll(Pageable pageable);
 	// Page<Member> findByNameContains(String name, Pageable pageable);
 //	Optional<Member> findById(Long id);
-	Optional<Member> findById(Long id);
+//	Optional<Member> findById(Long id);
+	Member findByEmail(String email);
 }

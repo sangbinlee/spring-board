@@ -1,5 +1,7 @@
 package com.smartscore.board.controller;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartscore.board.auth.JwtService;
+import com.smartscore.board.dto.AuthRequestDto;
 import com.smartscore.board.exception.EmployeeNotFoundException;
 import com.smartscore.board.repository.Member;
 import com.smartscore.board.repository.MemberCrudRepository;
@@ -39,8 +42,12 @@ public class MemberRestController {
 		log.info("member={}", member);
 		return memberService.signup(member);
 	}
-	@GetMapping("login")
-	String login(@RequestBody Member member) {
+//	@GetMapping("login")
+//	Map<String, Object> login(@RequestBody Member member) {
+//		return memberService.login(member);
+//	}
+	@PostMapping("login")
+	Map<String, String> login(@RequestBody AuthRequestDto member) {
 		return memberService.login(member);
 	}
 
