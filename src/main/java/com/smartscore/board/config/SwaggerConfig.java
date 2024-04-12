@@ -65,18 +65,19 @@ public class SwaggerConfig {
 	 *
 	 * @return
 	 */
-	@Bean
 	public OpenAPI openAPI() {
-		final String securitySchemeName = "bearerAuth";
 
+		final String securitySchemeName = "bearerAuth";
+		// Bearer Authentication
+		// .security(Collections.singletonList(securityRequirement))
+		// .in(SecurityScheme.In.HEADER)
 		SecurityRequirement securityRequirement = new SecurityRequirement()
-				.addList(securitySchemeName) // Bearer Authentication
+				.addList(securitySchemeName)
 				.addList(String.valueOf(new Scopes().addString("global", "access all APIs")));
 		return new OpenAPI(SpecVersion.V30)
 				.info(apiInfo())
 				.externalDocs(new ExternalDocumentation())
 				.servers(servers())
-				// .security(Collections.singletonList(securityRequirement))
 				.addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
 				.components(
 						new Components()
@@ -87,9 +88,7 @@ public class SwaggerConfig {
 												.type(SecurityScheme.Type.HTTP)
 												.scheme("bearer")
 												.bearerFormat("JWT")
-								// .in(SecurityScheme.In.HEADER)
 								));
-
 	}
 
 	/**
