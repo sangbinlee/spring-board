@@ -5,10 +5,12 @@ import java.util.Optional;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.smartscore.board.config.UserDetailsServiceImpl;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -41,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			log.info("[JwtAuthenticationFilter3] jwt={}", jwt);
 			log.info("[JwtAuthenticationFilter3] userId={}", userId);
-			var userDetails = this.userDetailsService.loadUserByUsername(userId);
+			UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 			log.info("[JwtAuthenticationFilter3] userDetails={}", userDetails);
 
 

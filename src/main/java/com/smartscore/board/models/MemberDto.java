@@ -1,4 +1,4 @@
-package com.smartscore.board.repository;
+package com.smartscore.board.models;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;

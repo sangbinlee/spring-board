@@ -1,4 +1,4 @@
-package com.bezkoder.spring.security.jwt.models;
+package com.smartscore.board.models;
 
 public enum ERole {
   ROLE_USER,

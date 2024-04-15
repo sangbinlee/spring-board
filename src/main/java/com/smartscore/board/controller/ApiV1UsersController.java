@@ -15,19 +15,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.smartscore.board.repository.UserRepository;
+import com.smartscore.board.models.User;
 import com.smartscore.board.repository.UserCrudRepository;
-import com.smartscore.board.repository.Users;
+import com.smartscore.board.repository.UserJpaRepository;
+import com.smartscore.board.repository.UserPagingAndSortingRepository;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController // This means that this class is a Controller
 @RequestMapping(path = "/api/v1/users") // This means URL's start with /demo (after Application path)
-@Tag(name = "Users 컨트롤러", description = "Users API입니다.")
+@Tag(name = "User 컨트롤러", description = "Users API입니다.")
 public class ApiV1UsersController {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserCrudRepository userCrudRepository2;
+	@Autowired
+	private UserJpaRepository userJpaRepository;
+	@Autowired
+	private UserPagingAndSortingRepository userPagingAndSortingRepository;
 
 	@Autowired
 	private UserCrudRepository userCrudRepository;
@@ -43,8 +48,8 @@ public class ApiV1UsersController {
 	 * @return 등록된 값 반환
 	 */
 	@PostMapping()
-	public Users create(@RequestBody Users users) {
-		return userCrudRepository.save(users);
+	public User create(@RequestBody User user) {
+		return userCrudRepository.save(user);
 	}
 
 	/**
@@ -61,8 +66,8 @@ public class ApiV1UsersController {
 	 * @return
 	 */
 	@PostMapping("multi-add")
-	public List<Users> creates(@RequestBody List<Users> users) {
-		for (Users user : users) {
+	public List<User> creates(@RequestBody List<User> users) {
+		for (User user : users) {
 			userCrudRepository.save(user);
 		}
 		return users;
@@ -74,7 +79,7 @@ public class ApiV1UsersController {
 	 * @return
 	 */
 	@GetMapping()
-	public Iterable<Users> retrieveAll() {
+	public Iterable<User> retrieveAll() {
 		return userCrudRepository.findAll();
 	}
 
@@ -87,7 +92,7 @@ public class ApiV1UsersController {
 	 * @return
 	 */
 	@GetMapping("ids")
-	public Iterable<Users> retrieveIds(@RequestBody Map<String, List<Long>> map  ) {
+	public Iterable<User> retrieveIds(@RequestBody Map<String, List<Long>> map  ) {
 		Iterable<Long> ids = map.get("ids");
 		return userCrudRepository.findAllById( ids);
 	}
@@ -99,7 +104,7 @@ public class ApiV1UsersController {
 	 * @return
 	 */
 	@GetMapping("{id}")
-	public Optional<Users> retrieveId(@PathVariable(name = "id") Long id) {
+	public Optional<User> retrieveId(@PathVariable(name = "id") Long id) {
 		return userCrudRepository.findById(id);
 	}
 
@@ -116,7 +121,7 @@ public class ApiV1UsersController {
 	 * @return
 	 */
 	@PutMapping("{id}")
-	public Users update(@PathVariable(name = "id") Long id, @RequestBody Users users) {
+	public User update(@PathVariable(name = "id") Long id, @RequestBody User users) {
 		return userCrudRepository.save(users);
 	}
 
@@ -133,7 +138,7 @@ public class ApiV1UsersController {
 	 */
 	@PatchMapping("{id}")
 	@Deprecated
-	public Users updateName(@PathVariable(name = "id") Long id, @RequestBody Users users) {
+	public User updateName(@PathVariable(name = "id") Long id, @RequestBody User users) {
 		return userCrudRepository.save(users);
 	}
 

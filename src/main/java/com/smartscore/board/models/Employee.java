@@ -1,4 +1,4 @@
-package com.smartscore.board.repository;
+package com.smartscore.board.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,12 +8,13 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Person {
+public class Employee {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String firstName;
-	private String lastName;
+	private String name;
+	private String role;
 
 }

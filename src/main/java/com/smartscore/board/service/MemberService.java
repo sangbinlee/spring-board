@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.smartscore.board.auth.JwtService;
 import com.smartscore.board.dto.AuthRequestDto;
-import com.smartscore.board.repository.Member;
+import com.smartscore.board.models.Member;
 import com.smartscore.board.repository.MemberCrudRepository;
 import com.smartscore.board.repository.MemberJpaRepository;
 import com.smartscore.board.repository.MemberPagingAndSortingRepository;

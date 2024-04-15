@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartscore.board.auth.JwtService;
 import com.smartscore.board.dto.AuthRequestDto;
 import com.smartscore.board.exception.EmployeeNotFoundException;
-import com.smartscore.board.repository.Member;
+import com.smartscore.board.models.Member;
 import com.smartscore.board.repository.MemberCrudRepository;
 import com.smartscore.board.repository.MemberJpaRepository;
 import com.smartscore.board.repository.MemberPagingAndSortingRepository;

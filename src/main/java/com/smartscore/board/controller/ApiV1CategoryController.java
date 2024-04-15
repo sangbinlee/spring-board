@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smartscore.board.models.Category;
 import com.smartscore.board.repository.CategoryRepository;
-import com.smartscore.board.repository.UserRepository;
-import com.smartscore.board.repository.UserCrudRepository;
-import com.smartscore.board.repository.Category;
 
 @RestController // This means that this class is a Controller
 @RequestMapping(path = "/api/v1/category") // This means URL's start with /demo (after Application path)

@@ -3,6 +3,9 @@ package com.smartscore.board.repository;
 import java.util.Optional;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
+
+import com.smartscore.board.models.Member;
+
 import java.util.List;
 
 

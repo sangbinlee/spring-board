@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartscore.board.exception.EmployeeNotFoundException;
-import com.smartscore.board.repository.Employee;
+import com.smartscore.board.models.Employee;
 import com.smartscore.board.repository.EmployeeRepository;
 
 @RestController

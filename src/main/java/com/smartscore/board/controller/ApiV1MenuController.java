@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.smartscore.board.repository.Menu;
+import com.smartscore.board.models.Menu;
 import com.smartscore.board.repository.MenuRepository;
 
 @RestController // This means that this class is a Controller

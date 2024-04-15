@@ -97,11 +97,10 @@ public class SwaggerConfig {
 	 * @return
 	 */
 	// @Profile({"!test && !dev"})
-	@Profile({ "test || dev" })
 	@Bean
+	@Profile({ "test || dev" })
 	public GroupedOpenApi chatOpenApi() {
 		String[] paths = { "/v1/**" };
-
 		return GroupedOpenApi.builder().group("COUPLE API v1").pathsToMatch(paths).build();
 	}
 

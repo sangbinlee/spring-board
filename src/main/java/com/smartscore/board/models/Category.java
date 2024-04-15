@@ -1,4 +1,4 @@
-package com.smartscore.board.repository;
+package com.smartscore.board.models;
 
 import java.util.ArrayList;
 import java.util.List;

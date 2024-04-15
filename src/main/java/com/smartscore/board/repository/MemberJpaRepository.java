@@ -1,6 +1,9 @@
 package com.smartscore.board.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.smartscore.board.models.Member;
+
 import java.util.List;
 
 

@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.smartscore.board.repository.Member;
-import com.smartscore.board.repository.MemberDto;
+import com.smartscore.board.models.Member;
+import com.smartscore.board.models.MemberDto;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
