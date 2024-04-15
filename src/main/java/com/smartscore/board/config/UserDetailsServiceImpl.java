@@ -16,16 +16,16 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-    public static final String USER = "user";
-    public static final String ADMIN = "admin";
-    public static final String USER_ROLE = "USER";
-    public static final String ADMIN_ROLE = "ADMIN";
+//    public static final String USER = "user";
+//    public static final String ADMIN = "admin";
+//    public static final String USER_ROLE = "USER";
+//    public static final String ADMIN_ROLE = "ADMIN";
 
-	private final MemberCrudRepository crudRepository;
+	private final MemberCrudRepository memberCrudRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		Member member = crudRepository.findByEmail(email)
+		Member member = memberCrudRepository.findByEmail(email)
 				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
 		User user = new User(member.getEmail(), member.getPassword(), new ArrayList<>());
         return getUser(user);
