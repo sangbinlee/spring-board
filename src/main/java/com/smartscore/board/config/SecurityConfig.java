@@ -53,6 +53,7 @@ public class SecurityConfig {
 				.userDetailsService(userDetailsService)
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+		        .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
 				.build();
 	}
 
