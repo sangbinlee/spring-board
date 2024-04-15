@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartscore.board.repository.UserRepository;
-import com.smartscore.board.repository.UserRepository2;
+import com.smartscore.board.repository.UserCrudRepository;
 import com.smartscore.board.repository.Users;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +30,7 @@ public class ApiV1UsersController {
 	private UserRepository userRepository;
 
 	@Autowired
-	private UserRepository2 userRepository2;
+	private UserCrudRepository userCrudRepository;
 
 	/**
 	 * 0. 등록하기 create
@@ -44,7 +44,7 @@ public class ApiV1UsersController {
 	 */
 	@PostMapping()
 	public Users create(@RequestBody Users users) {
-		return userRepository2.save(users);
+		return userCrudRepository.save(users);
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class ApiV1UsersController {
 	@PostMapping("multi-add")
 	public List<Users> creates(@RequestBody List<Users> users) {
 		for (Users user : users) {
-			userRepository2.save(user);
+			userCrudRepository.save(user);
 		}
 		return users;
 	}
@@ -75,7 +75,7 @@ public class ApiV1UsersController {
 	 */
 	@GetMapping()
 	public Iterable<Users> retrieveAll() {
-		return userRepository2.findAll();
+		return userCrudRepository.findAll();
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class ApiV1UsersController {
 	@GetMapping("ids")
 	public Iterable<Users> retrieveIds(@RequestBody Map<String, List<Long>> map  ) {
 		Iterable<Long> ids = map.get("ids");
-		return userRepository2.findAllById( ids);
+		return userCrudRepository.findAllById( ids);
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class ApiV1UsersController {
 	 */
 	@GetMapping("{id}")
 	public Optional<Users> retrieveId(@PathVariable(name = "id") Long id) {
-		return userRepository2.findById(id);
+		return userCrudRepository.findById(id);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class ApiV1UsersController {
 	 */
 	@PutMapping("{id}")
 	public Users update(@PathVariable(name = "id") Long id, @RequestBody Users users) {
-		return userRepository2.save(users);
+		return userCrudRepository.save(users);
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class ApiV1UsersController {
 	@PatchMapping("{id}")
 	@Deprecated
 	public Users updateName(@PathVariable(name = "id") Long id, @RequestBody Users users) {
-		return userRepository2.save(users);
+		return userCrudRepository.save(users);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class ApiV1UsersController {
 	 */
 	@DeleteMapping()
 	public void deleteAll() {
-		userRepository2.deleteAll();
+		userCrudRepository.deleteAll();
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class ApiV1UsersController {
 	@DeleteMapping("ids")
 	public void deleteIds(@RequestBody Map<String, List<Long>> map  ) {
 		Iterable<Long> ids = map.get("ids");
-		userRepository2.deleteAllById(ids);
+		userCrudRepository.deleteAllById(ids);
 	}
 
 	/**
@@ -174,6 +174,6 @@ public class ApiV1UsersController {
 	 */
 	@DeleteMapping("{id}")
 	public void deleteId(@PathVariable(name = "id") Long id) {
-		userRepository2.deleteById(id);
+		userCrudRepository.deleteById(id);
 	}
 }
