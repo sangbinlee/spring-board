@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.smartscore.board.auth.JwtAuthenticationFilter;
+import com.smartscore.board.security.jwt.AuthEntryPointJwt;
 
 import lombok.AllArgsConstructor;
 
@@ -22,8 +23,10 @@ import lombok.AllArgsConstructor;
 //@EnableWebSecurity
 public class SecurityConfig {
 
+	private final AuthEntryPointJwt unauthorizedHandler;
 	private final UserDetailsServiceImpl userDetailsService;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	
 	private final String[] AUTH_WHITELIST = {
 			"/home",
 			"/auth/login",
@@ -46,14 +49,18 @@ public class SecurityConfig {
 		return http
 				.cors(AbstractHttpConfigurer::disable)
 				.csrf(AbstractHttpConfigurer::disable)
-				.authorizeHttpRequests(auth -> auth
+				.authorizeHttpRequests( (auth) -> auth
 						.requestMatchers(AUTH_WHITELIST).permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.userDetailsService(userDetailsService)
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-		        .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+		        .exceptionHandling( (exceptionConfig) ->
+					exceptionConfig
+					.authenticationEntryPoint(unauthorizedHandler)
+//					.accessDeniedHandler(accessDeniedHandler)
+				)
+		        .userDetailsService(userDetailsService)
 				.build();
 	}
 
