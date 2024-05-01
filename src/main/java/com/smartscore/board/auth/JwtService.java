@@ -1,9 +1,11 @@
 package com.smartscore.board.auth;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.crypto.SecretKey;
 
@@ -50,7 +52,7 @@ public class JwtService {
 		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
 	}
 
-	public boolean validateToken(String token) {
+	public boolean validateJwtToken(String token) {
 		try {
 			Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token);
 			return true;
@@ -133,11 +135,31 @@ public class JwtService {
 	}
 
     public String generateToken(Map<String, Object> extraClaims, String username) {
+
+//		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+//		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+		Date nowDate = new Date();
+		Date expirationDate = new Date();
+
+//        LocalDateTime nowDate = LocalDateTime.now();
+//        LocalDateTime expirationDate = LocalDateTime.now();
+//		long expireTime = nowDate.getTime() + 86400000;
+		long expireTime = nowDate.getTime() + 1000 * 60;
+		expirationDate.setTime(expireTime);
+
+		log.info("[generateToken] nowDate={}", nowDate);
+		log.info("[generateToken] expirationDate={}", expirationDate);
+		log.info("[generateToken xxx] new Date(System.currentTimeMillis())={}", new Date(System.currentTimeMillis()));
+		log.info("[generateToken xxx] 1000 * 60 * 5={}", 1000 * 60 * 5);
+
+
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(username)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5))
+                .issuedAt(nowDate)
+                .expiration(expirationDate)
+//                .issuedAt(new Date(System.currentTimeMillis()))
+//                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5))
                 .signWith(getSecretKey())
                 .compact();
     }

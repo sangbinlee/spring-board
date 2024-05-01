@@ -5,20 +5,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.smartscore.board.exception.TokenRefreshException;
 import com.smartscore.board.models.RefreshToken;
+import com.smartscore.board.models.User;
 import com.smartscore.board.repository.RefreshTokenRepository;
 import com.smartscore.board.repository.UserRepository;
 
 
 @Service
 public class RefreshTokenService {
-  @Value("${bezkoder.app.jwtRefreshExpirationMs}")
-  private Long refreshTokenDurationMs;
+//  @Value("${bezkoder.app.jwtRefreshExpirationMs}")
+  private Long refreshTokenDurationMs = (long) (1000 * 60 * 2) ; // 2분
 
   @Autowired
   private RefreshTokenRepository refreshTokenRepository;
@@ -32,10 +32,11 @@ public class RefreshTokenService {
 
   public RefreshToken createRefreshToken(Long userId) {
     RefreshToken refreshToken = new RefreshToken();
-
-    refreshToken.setUser(userRepository.findById(userId).get());
+    User user = userRepository.findById(userId).get();
+    refreshToken.setUser(user);
     refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
     refreshToken.setToken(UUID.randomUUID().toString());
+    refreshToken.setId(user.getId());
 
     refreshToken = refreshTokenRepository.save(refreshToken);
     return refreshToken;

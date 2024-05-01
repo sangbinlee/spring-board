@@ -1,10 +1,13 @@
 package com.smartscore.board.service;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,9 +49,9 @@ public class MemberService {
 
 
     public Map<String, String> getToken( UserDetails userDetails) {
-        final var roles = userDetails.getAuthorities();
-        final var username = userDetails.getUsername();
-        final var token = jwtService.generateToken(Map.of("role", roles), username);
+    	Collection<? extends GrantedAuthority>  roles = userDetails.getAuthorities();
+        String username = userDetails.getUsername();
+        String token = jwtService.generateToken(Map.of("role", roles), username);
         return Map.of("token", token);
     }
 	/**
@@ -59,11 +62,10 @@ public class MemberService {
 	 */
 	public Map<String, String> login(AuthRequestDto authRequestDto) {
 
-
-	       final var authenticate = authenticationManager
-	    		   .authenticate(new UsernamePasswordAuthenticationToken(authRequestDto.email(), authRequestDto.password()));
-	       final var userDetails =  (UserDetails) authenticate.getPrincipal();
-	       return   getToken(userDetails);
+		Authentication authenticate = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(authRequestDto.email(), authRequestDto.password()));
+		UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
+		return getToken(userDetails);
 
 //		String email = authRequestDto.email();
 //		String password = authRequestDto.password();

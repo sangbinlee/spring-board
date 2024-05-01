@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.smartscore.board.config.UserDetailsServiceImpl;
+import com.smartscore.board.security.services.UserDetailsServiceImpl;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 			return;
 		}
+
 		log.info("[JwtAuthenticationFilter2]");
 		final String jwt = authHeader.get().substring(7);
 		final String userId = jwtService.extractUsername(jwt);
