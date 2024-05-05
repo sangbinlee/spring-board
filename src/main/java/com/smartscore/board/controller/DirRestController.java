@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "QR 컨트롤러", description = "QR코드 API입니다.")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("v1/dir")
+@RequestMapping("/api/v1/dir")
 public class DirRestController {
 
     private final DirRepository dirRepository;

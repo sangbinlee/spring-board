@@ -12,7 +12,7 @@
 
 
 
-INSERT INTO DIR (id, PARENT_ID, NAME) VALUES(1, null, '음식--');
+INSERT INTO DIR (id, PARENT_ID, NAME) VALUES(1, null, '음식');
 INSERT INTO DIR (id, PARENT_ID, NAME) VALUES(2, 1, '한식');
 INSERT INTO DIR (id, PARENT_ID, NAME) VALUES(3, 2, '콩나물국밥');
 INSERT INTO DIR (id, PARENT_ID, NAME) VALUES(4, 2, '비빔밥');
@@ -37,14 +37,23 @@ INSERT INTO DIR (id, PARENT_ID, NAME) VALUES(10, 8, '돈까스');
 
 
 --{{base_url}}/member/signup
-    insert
-    into member (email, password, role, username, id)
-    values
-        ('test4@test.com'
-        , '$2a$10$kA.unYIgq85.KEZSqDP.w.Rn8pV6BZvmNS.vRkI.tkry./kG5zr16'
-        , 'MEMBER'
-        , 'test4'
-        , default);
+--    insert
+--    into member (email, password, role, username, id)
+--    values
+--        ('test4@test.com'
+--        , '$2a$10$kA.unYIgq85.KEZSqDP.w.Rn8pV6BZvmNS.vRkI.tkry./kG5zr16'
+--        , 'MEMBER'
+--        , 'test4'
+--        , default);
+
+INSERT INTO USERS
+( USERNAME, EMAIL, PASSWORD
+, created_Date
+)
+VALUES( 'tester', 'tester@tester.com', '$2a$10$cGwPjroUZri3zCx1F8M5x.Vdl8WYry50Y7TulNeeDFopiykx50BT2'
+--,sysdate
+,localtimestamp
+);
 
 
 INSERT INTO ROLES( NAME) VALUES('ROLE_USER');
@@ -52,10 +61,6 @@ INSERT INTO ROLES( NAME) VALUES('ROLE_MODERATOR');
 INSERT INTO ROLES( NAME) VALUES('ROLE_ADMIN');
 
 
-
-INSERT INTO USERS
-( USERNAME, EMAIL, PASSWORD)
-VALUES( 'tester', 'tester@tester.com', '$2a$10$cGwPjroUZri3zCx1F8M5x.Vdl8WYry50Y7TulNeeDFopiykx50BT2');
 
 
 INSERT INTO USER1234.USER_ROLES

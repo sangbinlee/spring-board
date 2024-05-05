@@ -38,35 +38,29 @@ public class SecurityConfig {
 	private final UserDetailsServiceImpl userDetailsService;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-	private final String[] AUTH_WHITELIST = { "/home", "/auth/login", "/auth/create", "/api/v1/member/login",
-			"/api/v1/member/signup",
-//			"/api/v1/users",
-			"/api/v1/tutorials", // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-			"/api/v1/auth/**", "/api/v1/test/**", "/v3/api-docs/**", "/swagger-ui/**", "/actuator/**", "/v3/api-docs",
-			"/v3/api-docs/swagger-config" };
+	private final String[] AUTH_WHITELIST = {
+			"/home", "/auth/login", "/auth/create", "/api/v1/member/login", "/api/v1/member/signup"
+//			, "/api/v1/users"
+			, "/api/v1/dir" // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			, "/api/v1/tutorials" // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			, "/api/v1/auth/**", "/api/v1/test/**", "/v3/api-docs/**", "/swagger-ui/**", "/actuator/**", "/v3/api-docs",
+			"/v3/api-docs/swagger-config"
+	};
 
 	@Bean
 	@Order(0)
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-		 return
-			 http
-				.cors( (cors) -> cors
-						.configurationSource(apiConfigurationSource()))
+		return http.cors((cors) -> cors.configurationSource(apiConfigurationSource()))
 				.csrf(AbstractHttpConfigurer::disable)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests( (auth) -> auth
-						.requestMatchers(AUTH_WHITELIST).permitAll()
-						.anyRequest().authenticated())
+				.authorizeHttpRequests(
+						(auth) -> auth.requestMatchers(AUTH_WHITELIST).permitAll().anyRequest().authenticated())
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-		        .exceptionHandling( (exceptionConfig) ->
-					exceptionConfig
-					.authenticationEntryPoint(unauthorizedHandler)
-	//					.accessDeniedHandler(accessDeniedHandler)
-				)
-		        .userDetailsService(userDetailsService)
-		        .build();
+				.exceptionHandling((exceptionConfig) -> exceptionConfig.authenticationEntryPoint(unauthorizedHandler)
+				// .accessDeniedHandler(accessDeniedHandler)
+				).userDetailsService(userDetailsService).build();
 	}
 
 //	CorsConfigurationSource apiConfigurationSource() {
@@ -82,7 +76,7 @@ public class SecurityConfig {
 	CorsConfigurationSource apiConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 
-		config.setAllowCredentials(true);
+//		config.setAllowCredentials(true);
 		config.setAllowedOrigins(List.of("http://localhost:3000"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));

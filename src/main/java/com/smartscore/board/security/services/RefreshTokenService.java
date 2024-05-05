@@ -1,6 +1,7 @@
 package com.smartscore.board.security.services;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,10 +34,20 @@ public class RefreshTokenService {
   public RefreshToken createRefreshToken(Long userId) {
     RefreshToken refreshToken = new RefreshToken();
     User user = userRepository.findById(userId).get();
+
+
+
     refreshToken.setUser(user);
     refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
     refreshToken.setToken(UUID.randomUUID().toString());
-    refreshToken.setId(user.getId());
+
+
+    List<RefreshToken> RefreshTokens = refreshTokenRepository.findByUser(user);
+    if (RefreshTokens.size() != 0) {
+        long id = RefreshTokens.get(0).getId();
+        refreshToken.setId(id);
+//    	refreshToken.setId(user.getId());
+	}
 
     refreshToken = refreshTokenRepository.save(refreshToken);
     return refreshToken;

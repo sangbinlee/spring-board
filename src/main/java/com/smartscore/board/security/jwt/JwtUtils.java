@@ -47,7 +47,8 @@ public class JwtUtils {
 
 		Date nowDate = new Date();
 		Date expirationDate = new Date();
-		long expireTime = nowDate.getTime() + 1000 * 60;
+//		long expireTime = nowDate.getTime() + 1000 * 60;// 1초 * 60
+		long expireTime = nowDate.getTime() + 1000 * 60;// 1초 * 60 * 60 = 60븐 = 1시간
 		expirationDate.setTime(expireTime);
 
 		return Jwts.builder()
